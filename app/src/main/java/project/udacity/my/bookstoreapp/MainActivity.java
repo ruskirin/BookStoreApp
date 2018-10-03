@@ -9,11 +9,38 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private BookDbHelper dbHelper;
+
+    private String[] testProjection = {
+                BookEntry._ID,
+                BookEntry.COL_NAME,
+                BookEntry.COL_GENRE,
+                BookEntry.COL_PRICE,
+                BookEntry.COL_QUANTITY,
+                BookEntry.COL_SUPP_NAME,
+                BookEntry.COL_SUPP_PHONE
+    };
+
+    /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * Type "mainBookData" in Log Info to verify
+     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        putBookData("Cat in the Hat",
+                BookEntry.GENRE_FICTION,
+                20.00,
+                30,
+                "Cat",
+                "1800CATIHAT");
+        getBookData(testProjection);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,10 +51,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //TODO: call getWritableDatabase on different thread
-    private void insertBookData(@NonNull String name,
-                                int genre,
-                                float price,
-                                int quantity,
+    private void putBookData(@NonNull String name,
+                                          int genre,
+                                          double price,
+                                          int quantity,
                                 @Nullable String suppName,
                                 @Nullable String suppNum) {
 
@@ -55,6 +82,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error returned, entry not registered", Toast.LENGTH_LONG).show();
             else
                 Toast.makeText(this, name + " successfully registered!", Toast.LENGTH_LONG).show();
+
+            /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+             * Here is the log to verify everything functions
+             * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+             */
+            Log.i("mainBookData", "Row registered: " + rowId);
 
             db.close();
         }
@@ -109,9 +142,39 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        /**
-         * TODO: Do whatever with requested data
-         */
+        while(cursor.moveToNext()) {
+            int id = 0, genre = 0, quant = 0;
+            double price = 0.0;
+            String name = "", suppName = "", suppPhone = "";
+
+            if(idIndex != -1)
+                id = cursor.getInt(idIndex);
+            if(nameIndex != -1)
+                name = cursor.getString(nameIndex);
+            if(genreIndex != -1)
+                genre = cursor.getInt(genreIndex);
+            if(priceIndex != -1)
+                price = cursor.getDouble(priceIndex);
+            if(quantIndex != -1)
+                quant = cursor.getInt(quantIndex);
+            if(suppNameIndex != -1)
+                suppName = cursor.getString(suppNameIndex);
+            if(suppPhoneIndex != -1)
+                suppPhone = cursor.getString(suppPhoneIndex);
+
+
+            /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+             * Here is the log to verify everything functions
+             * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+             */
+            Log.i("mainBookData", "At ID: " + id
+                            + ", NAME: " + name
+                            + ", GENRE: " + genre
+                            + ", PRICE: " + price
+                            + ", QUANTITY: " + quant
+                            + ", SUPPLIER NAME: " + suppName
+                            + ", SUPPLIER PHONE: " + suppPhone);
+        }
 
         cursor.close();
         db.close();

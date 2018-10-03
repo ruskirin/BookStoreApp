@@ -30,6 +30,7 @@ public class BookDbHelper extends SQLiteOpenHelper {
                 + ");");
     }
 
+    //TODO: address the possible issue with this method
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + BookEntry.TABLE_NAME);
